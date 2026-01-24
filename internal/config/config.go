@@ -12,42 +12,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-/*type Config struct {
-	App   AppConfig   `mapstructure:"app"`
-	DB    DBConfig    `mapstructure:"db"`
-	Redis RedisConfig `mapstructure:"redis"`
-	Kafka KafkaConfig `mapstructure:"kafka"`
-}
-
-type AppConfig struct {
-	Name     string `mapstructure:"APP_NAME"`
-	Host     string `mapstructure:"HTTP_HOST"`
-	HttpPort int    `mapstructure:"HTTP_PORT"`
-	GrpcPort int    `mapstructure:"GRPC_PORT"`
-	LogLevel string `mapstructure:"LOG_LEVEL"`
-	Debug    bool   `mapstructure:"DEBUG_MODE"`
-}
-
-type DBConfig struct {
-	Host     string `mapstructure:"DB_HOST"`
-	Port     int    `mapstructure:"DB_PORT"`
-	Name     string `mapstructure:"DB_NAME"`
-	User     string `mapstructure:"DB_USER"`
-	Password string `mapstructure:"DB_PASSWORD"`
-	TLS      bool   `mapstructure:"DB_USE_TLS"`
-	DSN      string // ← генерируется, не читается из окружения
-}
-
-type RedisConfig struct {
-	Host   string `mapstructure:"REDIS_HOST"`
-	Prefix string `mapstructure:"REDIS_PREFIX"`
-}
-
-type KafkaConfig struct {
-	Host  string `mapstructure:"KAFKA_HOST"`
-	Group string `mapstructure:"KAFKA_GROUP_ID"`
-}*/
-
 type Config struct {
 	PostgresDSN  string `mapstructure:"POSTGRES_DSN"` // можно не задавать — мы строим сами
 	AppName      string `mapstructure:"APP_NAME"`

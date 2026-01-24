@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: base-service
+  name: selection-service
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: base-service
+      app: selection-service
   template:
     metadata:
       labels:
-        app: base-service
+        app: selection-service
     spec:
       containers:
-        - name: base-service
-          image: your-registry/base-service:latest
+        - name: selection-service
+          image: your-registry/selection-service:latest
           ports:
             - containerPort: 8080
           env:

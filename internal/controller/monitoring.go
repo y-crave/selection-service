@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"base-service/internal/service"
+	"selection-service/internal/service"
 	"context"
 	"net/http"
 	"time"
