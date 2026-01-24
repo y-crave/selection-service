@@ -32,7 +32,7 @@ type Config struct {
 
 func Load() *Config {
 	cfg := &Config{
-		AppName:      getEnv("APP_NAME", "base-service"),
+		AppName:      getEnv("APP_NAME", "selection-service"),
 		AppHost:      getEnv("HTTP_HOST", "0.0.0.0"),
 		AppHttpPort:  getEnvAsInt("HTTP_PORT", 8080),
 		AppGrpcPort:  getEnvAsInt("GRPC_PORT", 8081),
@@ -40,14 +40,14 @@ func Load() *Config {
 		DebugMode:    getEnvAsBool("DEBUG_MODE", false),
 		DBHost:       getEnv("DB_HOST", "localhost"),
 		DBPort:       getEnvAsInt("DB_PORT", 5432),
-		DBName:       getEnv("DB_NAME", "base_service"),
-		DBUser:       getEnv("DB_USER", "base"),
-		DBPassword:   getEnv("DB_PASSWORD", "base"),
+		DBName:       getEnv("DB_NAME", "selection_service"),
+		DBUser:       getEnv("DB_USER", "selection"),
+		DBPassword:   getEnv("DB_PASSWORD", "selection"),
 		DBTLS:        getEnvAsBool("DB_USE_TLS", false),
 		RedisHost:    getEnv("REDIS_HOST", "localhost:6379"),
-		RedisPref:    getEnv("REDIS_PREFIX", "base_"),
+		RedisPref:    getEnv("REDIS_PREFIX", "selection_"),
 		KafkaHost:    getEnv("KAFKA_HOST", "localhost:9092"),
-		KafkaGroupID: getEnv("KAFKA_GROUP_ID", "base.all"),
+		KafkaGroupID: getEnv("KAFKA_GROUP_ID", "selection.all"),
 	}
 
 	sslmode := "disable"
