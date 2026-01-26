@@ -3,15 +3,13 @@ package main
 import (
 	"base-service/internal/config"
 	"base-service/internal/controller"
-	"base-service/internal/repository"
 	"base-service/internal/service"
 	"database/sql"
-	"log"
-	"net/http"
-	"strconv"
-
+	"fmt"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"log"
+	"net/http"
 )
 
 func main() {
@@ -23,13 +21,19 @@ func main() {
 	}
 	defer db.Close()
 
-	userRepo := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepo)
-	userController := controller.NewUserController(userService)
+	monitoringService := service.NewMonitoringService(db)
+	monitoringController := controller.NewMonitoringController(monitoringService)
 
-	router := mux.NewRouter()
-	userController.RegisterRoutes(router)
+	mainRouter := mux.NewRouter()
 
-	log.Printf("Server started on port %d", cfg.HTTPPort)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(cfg.HTTPPort), router))
+	apiPrefix := fmt.Sprintf("/api/v1/%s/", cfg.AppName)
+	router := mainRouter.PathPrefix(apiPrefix).Subrouter()
+	monitoringController.RegisterRoutes(router)
+
+	addr := fmt.Sprintf("%s:%d", cfg.AppHost, cfg.AppHttpPort)
+	handler := config.LoggingMiddleware(router)
+
+	config.PrintRoutes(router)
+	log.Printf("Server started: %s", addr)
+	log.Fatal(http.ListenAndServe(addr, handler))
 }
