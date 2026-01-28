@@ -3,21 +3,54 @@ package domain
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/google/uuid"
 )
 
-type Sex string
+type SexEnum int
 
 const (
-	SexMale    Sex = "male"
-	SexFemale  Sex = "female" //  filter.Sex = domain.SexFemale
-	SexUnknown Sex = "unknown"
+	SexMale SexEnum = iota
+	SexFemale
+	NotSelected
 )
 
-func (s Sex) Valid() bool {
-	return s == SexMale || s == SexFemale || s == SexUnknown
+var sexName = map[SexEnum]string{
+	SexMale:     "Мужчина",
+	SexFemale:   "Женщина",
+	NotSelected: "Не выбрано",
+}
+
+func (s SexEnum) String() string {
+	return sexName[s]
+}
+
+func (s SexEnum) Valid() bool {
+	return s == SexMale || s == SexFemale || s == NotSelected
+}
+
+func (s SexEnum) ToDBValue() string {
+	switch s {
+	case SexMale:
+		return "male"
+	case SexFemale:
+		return "female"
+	default:
+		return "unknown"
+	}
+}
+
+func SexEnumFromDBValue(value string) (SexEnum, error) {
+	switch value {
+	case "male":
+		return SexMale, nil
+	case "female":
+		return SexFemale, nil
+	case "unknown":
+		return NotSelected, nil
+	default:
+		return NotSelected, errors.New("invalid sex value in database")
+	}
 }
 
 type SearchType struct {
@@ -30,14 +63,12 @@ type UserFilter struct {
 	ID           uuid.UUID
 	UserID       uuid.UUID
 	SearchTypeID uuid.UUID
-	Sex          Sex
+	Sex          SexEnum
 	UseTargetID  uuid.UUID
-	AgeFrom      *int
+	AgeFrom      *int // Использование *int для nullable полей → правильно, так как в PostgreSQL NULL ≠ 0
 	AgeTo        *int
 	HeightFrom   *int
 	HeightTo     *int
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
 	TagIDs       []uuid.UUID
 }
 

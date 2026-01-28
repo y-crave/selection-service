@@ -1,5 +1,7 @@
 CREATE TYPE sex AS ENUM ('male', 'female', 'unknown');
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE user_filters (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 user_id UUID NOT NULL,

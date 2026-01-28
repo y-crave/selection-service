@@ -1,30 +1,28 @@
-package model
+package user_filter
 
-type Sex string
+import "time"
 
-const(
-	SexMale Sex = "male"
-	SexFemale Sex = "female" //  filter.Sex = domain.SexFemale
-	SexUnknown Sex = "unknown" 
-)
-
-type SearchType struct {
-	ID   uuid.UUID `json:"id"`
-	Code string    `json:"code"`
-	Name string    `json:"name"` 
+type UserFilterEntity struct {
+	ID           string    `db:"id"` // UUID как строка для sqlx
+	UserID       string    `db:"user_id"`
+	SearchTypeID string    `db:"search_type_id"`
+	Sex          string    `db:"sex"` // "male"/"female"
+	UseTargetID  string    `db:"use_target_id"`
+	AgeFrom      *int      `db:"age_from"` // *int позволяет отличить «не задано» от «0 лет»
+	AgeTo        *int      `db:"age_to"`
+	HeightFrom   *int      `db:"height_from"`
+	HeightTo     *int      `db:"height_to"`
+	CreatedAt    time.Time `db:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at"`
 }
 
-type UserFilter struct{
-	ID           uuid.UUID `json:"id"`
-	UserID       uuid.UUID `json:"user_id"`
-	SearchTypeID uuid.UUID `json:"search_type_id"`
-	Sex          Sex       `json:"sex"`
-	UseTargetID  uuid.UUID `json:"use_target_id"`
-	AgeFrom      *int      `json:"age_from,omitempty"`
-	AgeTo        *int      `json:"age_to,omitempty"`
-	HeightFrom   *int      `json:"height_from,omitempty"`
-	HeightTo     *int      `json:"height_to,omitempty"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	TagIDs       []uuid.UUID `json:"tag_ids"`
+type UserFilterTagEntity struct {
+	FilterID string `db:"filter_id"`
+	TagID    string `db:"tag_id"`
+}
+
+type SearchTypeEntity struct {
+	ID   string `db:"id"`
+	Code string `db:"code"`
+	Name string `db:"name"`
 }
