@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
+	"log"
 	"net/url"
 	"os"
 	"strconv"
@@ -15,9 +17,6 @@ type Config struct {
 	AppGrpcPort  int
 	LogLevel     string
 	DebugMode    bool
-	RedisAddr    string
-	KafkaBroker  string
-	HTTPPort     int
 	DBHost       string
 	DBPort       int
 	DBName       string

@@ -19,7 +19,7 @@ CREATE UNIQUE INDEX ux_user_filters_user_id ON user_filters(user_id);
 
 
 CREATE TABLE user_filters_tags (
-filter_id UUID NOT NULL,
+user_filter_id UUID NOT NULL,
 tag_id UUID NOT NULL,
 created_at timestamptz NOT NULL DEFAULT now(),
 PRIMARY KEY (filter_id, tag_id)
