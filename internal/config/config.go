@@ -2,54 +2,69 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"os"
-	"strconv"
+
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	PostgresDSN  string
-	AppName      string
-	AppHost      string
-	AppHttpPort  int
-	AppGrpcPort  int
-	LogLevel     string
-	DebugMode    bool
-	RedisAddr    string
-	KafkaBroker  string
-	HTTPPort     int
-	DBHost       string
-	DBPort       int
-	DBName       string
-	DBUser       string
-	DBPassword   string
-	DBTLS        bool
-	RedisHost    string
-	RedisPref    string
-	KafkaHost    string
-	KafkaGroupID string
+	PostgresDSN  string `mapstructure:"POSTGRES_DSN"` // можно не задавать — мы строим сами
+	AppName      string `mapstructure:"APP_NAME"`
+	AppHost      string `mapstructure:"HTTP_HOST"`
+	AppHttpPort  int    `mapstructure:"HTTP_PORT"`
+	AppGrpcPort  int    `mapstructure:"GRPC_PORT"`
+	LogLevel     string `mapstructure:"LOG_LEVEL"`
+	DebugMode    bool   `mapstructure:"DEBUG_MODE"`
+	DBHost       string `mapstructure:"DB_HOST"`
+	DBPort       int    `mapstructure:"DB_PORT"`
+	DBName       string `mapstructure:"DB_NAME"`
+	DBUser       string `mapstructure:"DB_USER"`
+	DBPassword   string `mapstructure:"DB_PASSWORD"`
+	DBTLS        bool   `mapstructure:"DB_USE_TLS"`
+	RedisHost    string `mapstructure:"REDIS_HOST"`
+	RedisPref    string `mapstructure:"REDIS_PREFIX"`
+	KafkaHost    string `mapstructure:"KAFKA_HOST"`
+	KafkaGroupID string `mapstructure:"KAFKA_GROUP_ID"`
 }
 
 func Load() *Config {
-	cfg := &Config{
-		AppName:      getEnv("APP_NAME", "base-service"),
-		AppHost:      getEnv("HTTP_HOST", "0.0.0.0"),
-		AppHttpPort:  getEnvAsInt("HTTP_PORT", 8080),
-		AppGrpcPort:  getEnvAsInt("GRPC_PORT", 8081),
-		LogLevel:     getEnv("LOG_LEVEL", "INFO"),
-		DebugMode:    getEnvAsBool("DEBUG_MODE", false),
-		DBHost:       getEnv("DB_HOST", "localhost"),
-		DBPort:       getEnvAsInt("DB_PORT", 5432),
-		DBName:       getEnv("DB_NAME", "base_service"),
-		DBUser:       getEnv("DB_USER", "base"),
-		DBPassword:   getEnv("DB_PASSWORD", "base"),
-		DBTLS:        getEnvAsBool("DB_USE_TLS", false),
-		RedisHost:    getEnv("REDIS_HOST", "localhost:6379"),
-		RedisPref:    getEnv("REDIS_PREFIX", "base_"),
-		KafkaHost:    getEnv("KAFKA_HOST", "localhost:9092"),
-		KafkaGroupID: getEnv("KAFKA_GROUP_ID", "base.all"),
+	// Загружаем .env — если файла нет, это НЕ ошибка
+	if err := godotenv.Load(); err != nil {
+		// Проверяем: это "файл не найден" или реальная ошибка?
+		if !os.IsNotExist(err) {
+			// Например, файл есть, но повреждён — это уже проблема
+			log.Printf("Warning: failed to load .env: %v", err)
+		} else {
+			log.Println("Info: .env file not found, using system environment")
+		}
 	}
 
+	// 2. Настраиваем Viper
+	viper.SetConfigType("env") // говорим, что источник — env-стиль
+	viper.AutomaticEnv()       // разрешаем брать из системного окружения
+
+	// 3. Регистрируем все ключи, которые хотим прочитать
+	keys := []string{
+		"APP_NAME", "HTTP_HOST", "HTTP_PORT", "GRPC_PORT", "LOG_LEVEL", "DEBUG_MODE",
+		"DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD", "DB_USE_TLS",
+		"REDIS_HOST", "REDIS_PREFIX", "KAFKA_HOST", "KAFKA_GROUP_ID",
+	}
+
+	// Viper не читает автоматически все env vars — нужно "подсказать"
+	for _, key := range keys {
+		viper.BindEnv(key)
+	}
+
+	// 4. Читаем конфиг в структуру
+	var cfg Config
+	if err := viper.Unmarshal(&cfg); err != nil {
+		panic(fmt.Errorf("failed to unmarshal config: %w", err))
+	}
+
+	// 5. Строим PostgresDSN (как у тебя было)
 	sslmode := "disable"
 	if cfg.DBTLS {
 		sslmode = "require"
@@ -64,30 +79,5 @@ func Load() *Config {
 		user, password, cfg.DBHost, cfg.DBPort, cfg.DBName, sslmode,
 	)
 
-	return cfg
-}
-
-func getEnv(key, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		fmt.Printf("%s=%s\n", key, value)
-		return value
-	}
-	fmt.Printf("%s=%s\n", key, defaultValue)
-	return defaultValue
-}
-
-func getEnvAsInt(key string, defaultValue int) int {
-	valueStr := getEnv(key, strconv.Itoa(defaultValue))
-	if value, err := strconv.Atoi(valueStr); err == nil {
-		return value
-	}
-	return defaultValue
-}
-
-func getEnvAsBool(key string, defaultValue bool) bool {
-	valueStr := getEnv(key, strconv.FormatBool(defaultValue))
-	if value, err := strconv.ParseBool(valueStr); err == nil {
-		return value
-	}
-	return defaultValue
+	return &cfg
 }
