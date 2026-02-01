@@ -1,9 +1,7 @@
 CREATE TYPE sex AS ENUM ('male', 'female', 'unknown');
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE user_filters (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 user_id UUID NOT NULL,
 search_type_id UUID NOT NULL ,
 sex sex NOT NULL DEFAULT 'unknown',
@@ -32,7 +30,7 @@ CREATE INDEX idx_user_filters_tags_tag_id ON user_filters_tags(tag_id);
 
 
 CREATE TABLE search_types (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 code VARCHAR(50) NOT NULL DEFAULT 'romantic'
 name VARCHAR(50) NOT NULL 
 );

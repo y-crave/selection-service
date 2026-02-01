@@ -3,5 +3,3 @@ DROP TABLE IF EXISTS user_filters_tags;
 DROP TABLE IF EXISTS search_types;
 
 DROP ENUM IF EXISTS sex;
-
-DROP EXTENSION IF EXISTS "uuid-ossp";
