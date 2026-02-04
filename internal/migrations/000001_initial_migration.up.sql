@@ -22,7 +22,7 @@ CREATE TABLE user_filters_tags (
 user_filter_id UUID NOT NULL,
 tag_id UUID NOT NULL,
 created_at timestamptz NOT NULL DEFAULT now(),
-PRIMARY KEY (filter_id, tag_id)
+PRIMARY KEY (user_filter_id, tag_id)
 );
 
 CREATE INDEX idx_user_filters_tags_tag_id ON user_filters_tags(tag_id);
