@@ -2,51 +2,57 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
-	"log"
 	"net/url"
 	"os"
 	"strconv"
 )
 
 type Config struct {
-	PostgresDSN  string
-	AppName      string
-	AppHost      string
-	AppHttpPort  int
-	AppGrpcPort  int
-	LogLevel     string
-	DebugMode    bool
-	DBHost       string
-	DBPort       int
-	DBName       string
-	DBUser       string
-	DBPassword   string
-	DBTLS        bool
-	RedisHost    string
-	RedisPref    string
-	KafkaHost    string
-	KafkaGroupID string
+	PostgresDSN         string
+	AppName             string
+	AppHost             string
+	AppHttpPort         int
+	AppGrpcPort         int
+	LogLevel            string
+	DebugMode           bool
+	DBHost              string
+	DBPort              int
+	DBName              string
+	DBUser              string
+	DBPassword          string
+	DBTLS               bool
+	RedisHost           string
+	RedisPref           string
+	KafkaHost           string
+	KafkaGroupID        string
+	UserFilterMinAge    int
+	UserFIlterMaxAge    int
+	UserFIlterMinHeight int
+	UserFilterMaxHeight int
 }
 
 func Load() *Config {
 	cfg := &Config{
-		AppName:      getEnv("APP_NAME", "selection-service"),
-		AppHost:      getEnv("HTTP_HOST", "0.0.0.0"),
-		AppHttpPort:  getEnvAsInt("HTTP_PORT", 8080),
-		AppGrpcPort:  getEnvAsInt("GRPC_PORT", 8081),
-		LogLevel:     getEnv("LOG_LEVEL", "info"),
-		DebugMode:    getEnvAsBool("DEBUG_MODE", false),
-		DBHost:       getEnv("DB_HOST", "localhost"),
-		DBPort:       getEnvAsInt("DB_PORT", 5432),
-		DBName:       getEnv("DB_NAME", "selection_service"),
-		DBUser:       getEnv("DB_USER", "selection"),
-		DBPassword:   getEnv("DB_PASSWORD", "selection"),
-		DBTLS:        getEnvAsBool("DB_USE_TLS", false),
-		RedisHost:    getEnv("REDIS_HOST", "localhost:6379"),
-		RedisPref:    getEnv("REDIS_PREFIX", "selection_"),
-		KafkaHost:    getEnv("KAFKA_HOST", "localhost:9092"),
-		KafkaGroupID: getEnv("KAFKA_GROUP_ID", "selection.all"),
+		AppName:             getEnv("APP_NAME", "selection-service"),
+		AppHost:             getEnv("HTTP_HOST", "0.0.0.0"),
+		AppHttpPort:         getEnvAsInt("HTTP_PORT", 8080),
+		AppGrpcPort:         getEnvAsInt("GRPC_PORT", 8081),
+		LogLevel:            getEnv("LOG_LEVEL", "info"),
+		DebugMode:           getEnvAsBool("DEBUG_MODE", false),
+		DBHost:              getEnv("DB_HOST", "localhost"),
+		DBPort:              getEnvAsInt("DB_PORT", 5432),
+		DBName:              getEnv("DB_NAME", "selection_service"),
+		DBUser:              getEnv("DB_USER", "selection"),
+		DBPassword:          getEnv("DB_PASSWORD", "selection"),
+		DBTLS:               getEnvAsBool("DB_USE_TLS", false),
+		RedisHost:           getEnv("REDIS_HOST", "localhost:6379"),
+		RedisPref:           getEnv("REDIS_PREFIX", "selection_"),
+		KafkaHost:           getEnv("KAFKA_HOST", "localhost:9092"),
+		KafkaGroupID:        getEnv("KAFKA_GROUP_ID", "selection.all"),
+		UserFIlterMaxAge:    getEnvAsInt("MAX_AGE", 100),
+		UserFilterMinAge:    getEnvAsInt("MIN_AGE", 0),
+		UserFilterMaxHeight: getEnvAsInt("MAX_HEIGHT", 210),
+		UserFIlterMinHeight: getEnvAsInt("MIN_HEIGHT", 50),
 	}
 
 	sslmode := "disable"

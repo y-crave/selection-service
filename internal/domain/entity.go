@@ -72,14 +72,14 @@ type UserFilter struct {
 	TagIDs       []uuid.UUID
 }
 
-func (f *UserFilter) Validate() error {
+func (f *UserFilter) Validate(minAge, maxAge, minHeight, maxHeight int) error {
 	if err := f.validSex(); err != nil {
 		return err
 	}
-	if err := f.validAge(); err != nil {
+	if err := f.validAge(minAge, maxAge); err != nil {
 		return err
 	}
-	if err := f.validHeight(); err != nil {
+	if err := f.validHeight(minHeight, maxHeight); err != nil {
 		return err
 	}
 	return nil
@@ -92,12 +92,7 @@ func (f *UserFilter) validSex() error {
 	return nil
 }
 
-const (
-	minAge = 0
-	maxAge = 150
-)
-
-func (f *UserFilter) validAge() error {
+func (f *UserFilter) validAge(minAge, maxAge int) error {
 	if f.AgeFrom != nil {
 		if *f.AgeFrom < minAge || *f.AgeFrom > maxAge {
 			return fmt.Errorf("age_from must be between %d and %d years old", minAge, maxAge)
@@ -116,12 +111,7 @@ func (f *UserFilter) validAge() error {
 	return nil
 }
 
-const (
-	minHeight = 50
-	maxHeight = 300
-)
-
-func (f *UserFilter) validHeight() error {
+func (f *UserFilter) validHeight(minHeight, maxHeight int) error {
 	if f.HeightFrom != nil {
 		if *f.HeightFrom < minHeight || *f.HeightFrom > maxHeight {
 			return fmt.Errorf("height_from must be between %d and %d cm", minHeight, maxHeight)
