@@ -1,8 +1,9 @@
-package service
+package monitoring_service
 
 import (
 	"context"
-	"database/sql"
+
+	"gorm.io/gorm"
 )
 
 type MonitoringService interface {
@@ -10,13 +11,17 @@ type MonitoringService interface {
 }
 
 type monitoringService struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func NewMonitoringService(db *sql.DB) MonitoringService {
+func NewMonitoringService(db *gorm.DB) MonitoringService {
 	return &monitoringService{db: db}
 }
 
 func (s *monitoringService) CheckDB(ctx context.Context) error {
-	return s.db.PingContext(ctx)
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.PingContext(ctx)
 }

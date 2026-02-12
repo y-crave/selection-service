@@ -1,19 +1,20 @@
-package controller
+package monitoring_controller
 
 import (
-	"selection-service/internal/service"
 	"context"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"selection-service/internal/service/monitoring_service"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type MonitoringController struct {
-	service service.MonitoringService
+	service monitoring_service.MonitoringService
 }
 
-func NewMonitoringController(service service.MonitoringService) *MonitoringController {
+func NewMonitoringController(service monitoring_service.MonitoringService) *MonitoringController {
 	return &MonitoringController{service: service}
 }
 

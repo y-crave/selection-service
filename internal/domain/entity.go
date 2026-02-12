@@ -75,9 +75,6 @@ type UserFilter struct {
 }
 
 func (f *UserFilter) Validate(minAge, maxAge, minHeight, maxHeight int) error {
-	if err := f.validSex(); err != nil {
-		return err
-	}
 	if err := f.validAge(minAge, maxAge); err != nil {
 		return err
 	}
@@ -87,27 +84,20 @@ func (f *UserFilter) Validate(minAge, maxAge, minHeight, maxHeight int) error {
 	return nil
 }
 
-func (f *UserFilter) validSex() error {
-	if !f.Sex.Valid() {
-		return errors.New("invalid sex")
-	}
-	return nil
-}
-
 func (f *UserFilter) validAge(minAge, maxAge int) error {
 	if f.AgeFrom != nil {
 		if *f.AgeFrom < minAge || *f.AgeFrom > maxAge {
-			return fmt.Errorf("age_from must be between %d and %d years old", minAge, maxAge)
+			return ErrAgeOutOfRange
 		}
 	}
 	if f.AgeTo != nil {
 		if *f.AgeTo < minAge || *f.AgeTo > maxAge {
-			return fmt.Errorf("age_to must be between %d and %d years old", minAge, maxAge)
+			return ErrAgeOutOfRange
 		}
 	}
 	if f.AgeFrom != nil && f.AgeTo != nil {
 		if *f.AgeFrom > *f.AgeTo {
-			return errors.New("age_from must be <= age_to")
+			return ErrInvalidAgeRange
 		}
 	}
 	return nil
@@ -116,17 +106,17 @@ func (f *UserFilter) validAge(minAge, maxAge int) error {
 func (f *UserFilter) validHeight(minHeight, maxHeight int) error {
 	if f.HeightFrom != nil {
 		if *f.HeightFrom < minHeight || *f.HeightFrom > maxHeight {
-			return fmt.Errorf("height_from must be between %d and %d cm", minHeight, maxHeight)
+			return ErrHeightOutOfRange
 		}
 	}
 	if f.HeightTo != nil {
 		if *f.HeightTo < minHeight || *f.HeightTo > maxHeight {
-			return fmt.Errorf("height_to must be between %d and %d cm", minHeight, maxHeight)
+			return ErrHeightOutOfRange
 		}
 	}
 	if f.HeightFrom != nil && f.HeightTo != nil {
 		if *f.HeightFrom > *f.HeightTo {
-			return errors.New("height_from must be <= height_to")
+			return ErrInvalidHeightRange
 		}
 	}
 

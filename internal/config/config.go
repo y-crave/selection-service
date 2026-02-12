@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+
 	"net/url"
 	"os"
 	"strconv"
@@ -26,8 +27,8 @@ type Config struct {
 	KafkaHost           string
 	KafkaGroupID        string
 	UserFilterMinAge    int
-	UserFIlterMaxAge    int
-	UserFIlterMinHeight int
+	UserFilterMaxAge    int
+	UserFilterMinHeight int
 	UserFilterMaxHeight int
 }
 
@@ -49,10 +50,10 @@ func Load() *Config {
 		RedisPref:           getEnv("REDIS_PREFIX", "selection_"),
 		KafkaHost:           getEnv("KAFKA_HOST", "localhost:9092"),
 		KafkaGroupID:        getEnv("KAFKA_GROUP_ID", "selection.all"),
-		UserFIlterMaxAge:    getEnvAsInt("MAX_AGE", 100),
+		UserFilterMaxAge:    getEnvAsInt("MAX_AGE", 100),
 		UserFilterMinAge:    getEnvAsInt("MIN_AGE", 0),
 		UserFilterMaxHeight: getEnvAsInt("MAX_HEIGHT", 210),
-		UserFIlterMinHeight: getEnvAsInt("MIN_HEIGHT", 50),
+		UserFilterMinHeight: getEnvAsInt("MIN_HEIGHT", 50),
 	}
 
 	sslmode := "disable"

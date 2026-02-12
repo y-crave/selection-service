@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*package user_filter
 
 import (
@@ -31,3 +32,61 @@ func (r *Repository) GetByID(filterID string) (*domain.UserFilter, error) {
 	return filter, nil
 }
 */
+=======
+package user_filter_repo
+
+import (
+	"context"
+	"selection-service/internal/domain"
+	"selection-service/internal/repository"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+type filterRepo struct {
+	db *gorm.DB
+}
+
+func NewUserFilterRepo(db *gorm.DB) repository.FilterRepo {
+	return &filterRepo{
+		db: db,
+	}
+}
+
+func (r *filterRepo) Create(ctx context.Context, filter domain.UserFilter) error {
+	/*	gormFilter := ToGormUserFilter(&filter)
+		err := r.db.WithContext(ctx).Create(&gormFilter).Error
+		if err != nil {
+			return fmt.Errorf("create user filter: %w", err)
+		}
+
+		if len(filter.TagIDs) >0 {
+			links:= make([]GormUserFilter, len(filter.TagIDs))
+			for i, tagID := range filter.TagIDs {
+
+			}
+
+		}*/
+	return nil
+}
+
+func (r *filterRepo) Read(ctx context.Context, id uuid.UUID) (domain.UserFilter, error) {
+	/*	var gormFilter GormUserFilter
+		if err := r.db.WithContext(ctx).First(&gormFilter, id).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return domain.UserFilter{}, domain.ErrInternal
+			}
+		}*/
+	return domain.UserFilter{}, nil
+}
+func (r *filterRepo) Update(ctx context.Context, filter domain.UserFilter) error {
+	return nil
+}
+func (r *filterRepo) Delete(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
+func (r *filterRepo) FindByUserAndUseTarget(ctx context.Context, userID uuid.UUID, targetID uuid.UUID) (domain.UserFilter, error) {
+	return domain.UserFilter{}, nil
+}
+>>>>>>> 2098faa (add interfaces for repo&service;add empty methods;add controller)
