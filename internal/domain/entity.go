@@ -1,9 +1,6 @@
 package domain
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -67,7 +64,7 @@ type UserFilter struct {
 	SearchTypeID uuid.UUID
 	Sex          SexEnum
 	UseTargetID  uuid.UUID
-	AgeFrom      *int // Использование *int для nullable полей → правильно, так как в PostgreSQL NULL ≠ 0
+	AgeFrom      *int
 	AgeTo        *int
 	HeightFrom   *int
 	HeightTo     *int

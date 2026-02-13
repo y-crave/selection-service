@@ -19,14 +19,12 @@ func NewMonitoringController(service monitoring_service.MonitoringService) *Moni
 }
 
 func (c *MonitoringController) LivenessProbe(w http.ResponseWriter, r *http.Request) {
-	// Простая проверка: если сервер запущен — OK
 	log.Println("GET /healthz")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("alive"))
 }
 
 func (c *MonitoringController) ReadinessProbe(w http.ResponseWriter, r *http.Request) {
-	// Проверяем подключение к БД
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 

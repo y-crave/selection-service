@@ -1,9 +1,7 @@
 package filter_controller
 
 import (
-	"context"
 	"net/http"
-	"selection-service/internal/domain"
 	"selection-service/internal/service"
 
 	"github.com/gorilla/mux"
@@ -18,13 +16,10 @@ func NewFilterController(svc service.FilterService) *filterController {
 }
 
 func (c *filterController) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/api/v1/filter", c.CreateFilter).Methods(http.MethodPost)
-
+	// todo handler
+	/*	router.HandleFunc("/api/v1/filter", c.CreateFilter).Methods(http.MethodPost)*/
 }
 
 func (c *filterController) SaveFilter(w http.ResponseWriter, r *http.Request) {
-	// ... парсинг
-
-	// В сервисе: "сохрани или обнови"
-	err := c.svc.SaveFilter(r.Context(), *filter)
+	//todo В сервисе: "сохрани или обнови"
 }

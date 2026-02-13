@@ -1,9 +1,8 @@
 package filter_controller
 
 import (
-	"selection-service/internal/domain"
-
 	"github.com/google/uuid"
+	"selection-service/internal/domain"
 )
 
 func (j *JSONUserFilter) JSONToDomain() (*domain.UserFilter, error) {
@@ -31,11 +30,10 @@ func (j *JSONUserFilter) JSONToDomain() (*domain.UserFilter, error) {
 		return nil, domain.ErrInvalidUseTargetID
 	}
 
-	// 2. Валидация и парсинг Sex — КЛЮЧЕВОЙ МОМЕНТ
 	if !domain.IsValidSexValue(j.Sex) {
 		return nil, domain.ErrInvalidSexValue
 	}
-	sex := domain.SexEnumFromDBValue(j.Sex) // теперь безопасно
+	sex := domain.SexEnumFromDBValue(j.Sex)
 
 	tagIDs := make([]uuid.UUID, len(j.TagIDs))
 	for i, s := range j.TagIDs {

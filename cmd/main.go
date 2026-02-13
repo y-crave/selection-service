@@ -18,13 +18,10 @@ import (
 )
 
 func main() {
-	// 1. Загружаем конфигурацию
 	cfg := config.Load()
 
-	// 2. Инициализируем GORM
 	db, err := gorm.Open(postgres.Open(cfg.PostgresDSN), &gorm.Config{
-		// Опционально: включить логирование SQL (только для dev!)
-		// Logger: logger.Default.LogMode(logger.Info),
+		// todo логирование sql
 	})
 	if err != nil {
 		log.Fatal("failed to connect to database: ", err)
@@ -46,16 +43,12 @@ func main() {
 	log.Printf("Server started: %s", addr)
 	log.Fatal(http.ListenAndServe(addr, handler))
 
-	// 3. Создаём репозиторий
 	filterRepo := user_filter_repo.NewUserFilterRepo(db)
 
-	// 4. Создаём сервис
 	filterService := user_filter_service.NewFilterService(filterRepo)
 
-	// 5. Дальше — инициализация HTTP-сервера, роутер и т.д.
-	// Например:
-	// router := mux.NewRouter()
-	// filterCtrl := filter_controller.NewFilterController(filterService, cfg)
-	// filterCtrl.RegisterRoutes(router)
-	// log.Fatal(http.ListenAndServe(":8080", router))
+	// todo Дальше — инициализация HTTP-сервера, роутер и т.д.
+
+	filterCtrl := filter_controller.NewFilterController(filterService)
+
 }
