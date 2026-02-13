@@ -15,42 +15,44 @@ const (
 	NotSelected
 )
 
-var sexName = map[SexEnum]string{
-	SexMale:     "Мужчина",
-	SexFemale:   "Женщина",
-	NotSelected: "Не выбрано",
+var sexToString = map[SexEnum]string{
+	SexMale:     "male",
+	SexFemale:   "female",
+	NotSelected: "unknown",
 }
 
-func (s SexEnum) String() string {
-	return sexName[s]
-}
-
-func (s SexEnum) Valid() bool {
-	return s == SexMale || s == SexFemale || s == NotSelected
+var stringToSex = map[string]SexEnum{
+	"male":    SexMale,
+	"female":  SexFemale,
+	"unknown": NotSelected,
 }
 
 func (s SexEnum) ToDBValue() string {
-	switch s {
-	case SexMale:
-		return "male"
-	case SexFemale:
-		return "female"
-	default:
-		return "unknown"
+	if v, ok := sexToString[s]; ok {
+		return v
 	}
+	return "unknown"
 }
 
-func SexEnumFromDBValue(value string) (SexEnum, error) {
-	switch value {
-	case "male":
-		return SexMale, nil
-	case "female":
-		return SexFemale, nil
-	case "unknown":
-		return NotSelected, nil
-	default:
-		return NotSelected, errors.New("invalid sex value in database")
+func (s SexEnum) String() string {
+	return s.ToDBValue()
+}
+
+func (s SexEnum) Valid() bool {
+	_, ok := sexToString[s]
+	return ok
+}
+
+func SexEnumFromDBValue(value string) SexEnum {
+	if s, ok := stringToSex[value]; ok {
+		return s
 	}
+	return NotSelected
+}
+
+func IsValidSexValue(s string) bool {
+	_, ok := stringToSex[s]
+	return ok
 }
 
 type SearchType struct {
