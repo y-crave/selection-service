@@ -11,7 +11,8 @@ age_to int NULL,
 height_from int NULL,
 height_to int NULL,
 created_at timestamptz NOT NULL DEFAULT now(),
-updated_at timestamptz NOT NULL DEFAULT now() 
+updated_at timestamptz NOT NULL DEFAULT now()
+  CONSTRAINT fk_targets FOREIGN KEY (search_type_id) REFERENCES search_type(id)
 );
 
 CREATE UNIQUE INDEX ux_user_filters_user_id ON user_filters(user_id);
