@@ -2,24 +2,24 @@ package filter_controller
 
 import (
 	"net/http"
-	"selection-service/internal/service"
+	"selection-service/internal/contracts"
 
 	"github.com/gorilla/mux"
 )
 
-type filterController struct {
-	svc service.FilterService
+type FilterController struct {
+	svc contracts.FilterService
 }
 
-func NewFilterController(svc service.FilterService) *filterController {
-	return &filterController{svc: svc}
+func NewFilterController(svc contracts.FilterService) *FilterController {
+	return &FilterController{svc: svc}
 }
 
-func (c *filterController) RegisterRoutes(router *mux.Router) {
+func (c *FilterController) RegisterRoutes(router *mux.Router) {
 	// todo handler
 	/*	router.HandleFunc("/api/v1/filter", c.CreateFilter).Methods(http.MethodPost)*/
 }
 
-func (c *filterController) SaveFilter(w http.ResponseWriter, r *http.Request) {
+func (c *FilterController) SaveFilter(w http.ResponseWriter, r *http.Request) {
 	//todo В сервисе: "сохрани или обнови"
 }
