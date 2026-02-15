@@ -51,8 +51,8 @@ func Load() *Config {
 		KafkaHost:           getEnv("KAFKA_HOST", "localhost:9092"),
 		KafkaGroupID:        getEnv("KAFKA_GROUP_ID", "selection.all"),
 		UserFilterMaxAge:    getEnvAsInt("MAX_AGE", 100),
-		UserFilterMinAge:    getEnvAsInt("MIN_AGE", 0),
-		UserFilterMaxHeight: getEnvAsInt("MAX_HEIGHT", 210),
+		UserFilterMinAge:    getEnvAsInt("MIN_AGE", 18),
+		UserFilterMaxHeight: getEnvAsInt("MAX_HEIGHT", 300),
 		UserFilterMinHeight: getEnvAsInt("MIN_HEIGHT", 50),
 	}
 
