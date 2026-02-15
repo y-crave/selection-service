@@ -1,33 +1,36 @@
-/*package user_filter
+package user_filter_repo
 
 import (
-	"github.com/jmoiron/sqlx"
+	"context"
 	"selection-service/internal/domain"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
-type Repository struct {
-	db *sqlx.DB
+type FilterRepo struct {
+	db *gorm.DB
 }
 
-func (r *Repository) GetByID(filterID string) (*domain.UserFilter, error) {
-	// 1. Загружаем основную сущность
-	var ent UserFilterEntity
-	err := r.db.Get(&ent, "SELECT * FROM user_filters WHERE id = $1", filterID)
-	if err != nil {
-		return nil, err // оберни в domain.ErrNotFound при необходимости
+func NewUserFilterRepo(db *gorm.DB) *FilterRepo {
+	return &FilterRepo{
+		db: db,
 	}
-
-	// 2. Загружаем теги
-	var tagEnts []UserFilterTagEntity
-	err = r.db.Select(&tagEnts, "SELECT tag_id FROM user_filter_tags WHERE filter_id = $1", filterID)
-	if err != nil {
-		return nil, err
-	}
-
-	// 3. Маппинг в домен
-	filter := ToDomain(&ent)
-	filter.Tags = ToTagIDs(tagEnts) // предположим, Tags = []string в домене
-
-	return filter, nil
 }
-*/
+
+func (r *FilterRepo) Create(ctx context.Context, filter domain.UserFilter) error {
+	return nil
+}
+
+func (r *FilterRepo) Read(ctx context.Context, id uuid.UUID) (domain.UserFilter, error) {
+	return domain.UserFilter{}, nil
+}
+func (r *FilterRepo) Update(ctx context.Context, filter domain.UserFilter) error {
+	return nil
+}
+func (r *FilterRepo) Delete(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
+func (r *FilterRepo) FindByUserAndUseTarget(ctx context.Context, userID uuid.UUID, targetID uuid.UUID) (domain.UserFilter, error) {
+	return domain.UserFilter{}, nil
+}
