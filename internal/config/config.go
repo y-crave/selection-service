@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"net/url"
 	"os"
 
@@ -31,52 +31,37 @@ type Config struct {
 }
 
 func Load() *Config {
+	log := slog.Default()
 	// Загружаем .env — если файла нет, это НЕ ошибка
 	if err := godotenv.Load(); err != nil {
 		// Проверяем: это "файл не найден" или реальная ошибка?
 		if !os.IsNotExist(err) {
 			// Например, файл есть, но повреждён — это уже проблема
-			log.Printf("Warning: failed to load .env: %v", err)
+			log.Error("failed to load", ".env:", err)
 		} else {
-			log.Println("Info: .env file not found, using system environment")
+			log.Warn(".env file not found using system environment")
 		}
 	}
 
-	// 2. Настраиваем Viper
-	viper.SetConfigType("env") // говорим, что источник — env-стиль
-	viper.AutomaticEnv()       // разрешаем брать из системного окружения
+	// 2. Настраиваем Viper — достаточно одного вызова!
+	viper.AutomaticEnv() // автоматически ищет переменные в UPPER_SNAKE_CASE (как в наших тегах)
 
-	// 3. Регистрируем все ключи, которые хотим прочитать
-	keys := []string{
-		"APP_NAME", "HTTP_HOST", "HTTP_PORT", "GRPC_PORT", "LOG_LEVEL", "DEBUG_MODE",
-		"DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD", "DB_USE_TLS",
-		"REDIS_HOST", "REDIS_PREFIX", "KAFKA_HOST", "KAFKA_GROUP_ID",
-	}
-
-	// Viper не читает автоматически все env vars — нужно "подсказать"
-	for _, key := range keys {
-		viper.BindEnv(key)
-	}
-
-	// 4. Читаем конфиг в структуру
+	// 3. Читаем напрямую в структуру — без ручного списка ключей!
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
-		panic(fmt.Errorf("failed to unmarshal config: %w", err))
+		log.Error("failed to unmarshal config", "config", err)
+		return nil
 	}
 
-	// 5. Строим PostgresDSN (как у тебя было)
+	// 4. Строим DSN (POSTGRES_DSN не читаем из окружения — генерируем сами)
 	sslmode := "disable"
 	if cfg.DBTLS {
 		sslmode = "require"
 	}
-
-	// Экранируем user и password на случай спецсимволов
 	user := url.QueryEscape(cfg.DBUser)
 	password := url.QueryEscape(cfg.DBPassword)
-
 	cfg.PostgresDSN = fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?sslmode=%s",
-		user, password, cfg.DBHost, cfg.DBPort, cfg.DBName, sslmode,
+		"postgres://%s:%s@%s:%d/%s?sslmode=%s", user, password, cfg.DBHost, cfg.DBPort, cfg.DBName, sslmode,
 	)
 
 	return &cfg

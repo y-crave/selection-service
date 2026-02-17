@@ -3,7 +3,6 @@ package controller
 import (
 	"base-service/internal/service"
 	"context"
-	"log"
 	"net/http"
 	"time"
 
