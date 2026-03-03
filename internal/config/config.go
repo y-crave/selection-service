@@ -79,26 +79,7 @@ func Load() (*Config, error) {
 	}
 	setDefaults()
 	viper.AutomaticEnv()
-	/*
-		cfg := Config{
-			AppName:      viper.GetString("APP_NAME"),
-			HttpHost:     viper.GetString("HTTP_HOST"),
-			HttpPort:     viper.GetInt("HTTP_PORT"),
-			GrpcPort:     viper.GetInt("GRPC_PORT"),
-			LogLevel:     viper.GetString("LOG_LEVEL"),
-			DebugMode:    viper.GetBool("DEBUG_MODE"),
-			DbHost:       viper.GetString("DB_HOST"),
-			DbPort:       viper.GetInt("DB_PORT"),
-			DbName:       viper.GetString("DB_NAME"),
-			DbUser:       viper.GetString("DB_USER"),
-			DbPassword:   viper.GetString("DB_PASSWORD"),
-			DbUseTls:     viper.GetBool("DB_USE_TLS"),
-			RedisHost:    viper.GetString("REDIS_HOST"),
-			RedisPrefix:  viper.GetString("REDIS_PREFIX"),
-			KafkaHost:    viper.GetString("KAFKA_HOST"),
-			KafkaGroupId: viper.GetString("KAFKA_GROUP_ID"),
-		}
-	*/
+
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
 		log.Error("failed to unmarshal config", "config", err)
