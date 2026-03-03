@@ -131,7 +131,6 @@ func Load() (*Config, error) {
 }
 
 func setDefaults() {
-	// === Приложение ===
 	viper.SetDefault("APP_NAME", "base-service")
 	viper.SetDefault("HTTP_HOST", "0.0.0.0") // Слушать все интерфейсы
 	viper.SetDefault("HTTP_PORT", 8080)      // Стандартный HTTP порт
@@ -139,14 +138,18 @@ func setDefaults() {
 	viper.SetDefault("LOG_LEVEL", "info")    // Уровень логирования
 	viper.SetDefault("DEBUG_MODE", false)    // Режим отладки
 
-	// === База данных (порт и TLS опциональны) ===
+	viper.SetDefault("DB_HOST", "localhost")
+	viper.SetDefault("DB_NAME", "base_service")
+	viper.SetDefault("DB_USER", "postgres")
+	viper.SetDefault("DB_PASSWORD", "postgres")
+	viper.SetDefault("REDIS_HOST", "localhost:0000")
+	viper.SetDefault("KAFKA_HOST", "localhost:0000")
+
 	viper.SetDefault("DB_PORT", 5432)     // Стандартный порт PostgreSQL
 	viper.SetDefault("DB_USE_TLS", false) // Без TLS по умолчанию
 
-	// === Redis (префикс опционален) ===
 	viper.SetDefault("REDIS_PREFIX", "base-service")
 
-	// === Kafka (group ID опционален) ===
 	viper.SetDefault("KAFKA_GROUP_ID", "base-service-group")
 }
 
