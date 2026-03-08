@@ -74,7 +74,7 @@ func Load() (*Config, error) {
 		if !os.IsNotExist(err) {
 			log.Error("failed to load .env file", "error", err)
 		} else {
-			log.Warn(".env file not found, using system environment")
+			log.Debug(".env file not found, using system environment")
 		}
 	}
 	setDefaults()
