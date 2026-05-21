@@ -1,4 +1,4 @@
-module base-service
+module selection-service
 
 go 1.23.5
 
