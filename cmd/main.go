@@ -1,9 +1,9 @@
 package main
 
 import (
-	"base-service/internal/config"
-	"base-service/internal/controller"
-	"base-service/internal/service"
+	"selection-service/internal/config"
+	"selection-service/internal/controller"
+	"selection-service/internal/service"
 	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"

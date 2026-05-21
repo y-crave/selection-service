@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/y-crave/selection-service
+
+jobs:
+  # ── 1. Lint + Test ───────────────────────────────────────────────────────────
+  lint-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=5m
+
+      - name: Run tests
+        run: go test -race -coverprofile=coverage.out ./...
+
+  # ── 2. Security scan (filesystem) ────────────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trivy — filesystem scan (CRITICAL+HIGH)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+  # ── 3. Build & Push: main → dev-*; тег v* → образ с тем же тегом ─────────────
+  build-push:
+    name: Build & Push Image
+    runs-on: ubuntu-latest
+    needs: [lint-test, security]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    outputs:
+      image_tag: ${{ steps.prep.outputs.pull_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare image tags
+        id: prep
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            {
+              echo 'tags<<EOF'
+              echo "${{ env.IMAGE_NAME }}:dev-${{ github.sha }}"
+              echo "${{ env.IMAGE_NAME }}:dev-latest"
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+            echo "pull_tag=dev-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+            {
+              echo 'tags<<EOF'
+              echo "${{ env.IMAGE_NAME }}:${TAG}"
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+            echo "pull_tag=${TAG}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./deploy/Dockerfile
+          push: true
+          tags: ${{ steps.prep.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verify image runs selection-service binary (not placeholder)
+        env:
+          VERIFY_TAG: ${{ steps.prep.outputs.pull_tag }}
+        run: |
+          docker pull "${IMAGE_NAME}:${VERIFY_TAG}"
+          ep="$(docker inspect --format '{{range .Config.Entrypoint}}{{.}} {{end}}' "${IMAGE_NAME}:${VERIFY_TAG}" | tr -d '[:space:]')"
+          if [ "$ep" != "/selection-service" ]; then
+            echo "Expected Entrypoint '/selection-service', got '${ep}'. Подставной образ (например с top) или неверный Dockerfile."
+            docker inspect "${IMAGE_NAME}:${VERIFY_TAG}"
+            exit 1
+          fi
+
+      - name: Trivy — scan pushed image
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: ${{ env.IMAGE_NAME }}:${{ steps.prep.outputs.pull_tag }}
+          severity: CRITICAL
+          format: table
+        continue-on-error: true
