@@ -21,7 +21,7 @@ func (c *MonitoringController) LivenessProbe(w http.ResponseWriter, r *http.Requ
 	// Простая проверка: если сервер запущен — OK
 	log.Println("GET /healthz")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("alive"))
+	_, _ = w.Write([]byte("alive"))
 }
 
 func (c *MonitoringController) ReadinessProbe(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +37,7 @@ func (c *MonitoringController) ReadinessProbe(w http.ResponseWriter, r *http.Req
 	// TODO: добавить проверку других зависимостей: Redis, Kafka и т.д.
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("ready"))
+	_, _ = w.Write([]byte("ready"))
 }
 
 func (c *MonitoringController) RegisterRoutes(router *mux.Router) {
