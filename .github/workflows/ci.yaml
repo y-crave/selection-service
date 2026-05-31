@@ -119,8 +119,8 @@ jobs:
         run: |
           docker pull "${IMAGE_NAME}:${VERIFY_TAG}"
           ep="$(docker inspect --format '{{range .Config.Entrypoint}}{{.}} {{end}}' "${IMAGE_NAME}:${VERIFY_TAG}" | tr -d '[:space:]')"
-          if [ "$ep" != "/selection-service" ]; then
-            echo "Expected Entrypoint '/selection-service', got '${ep}'. Подставной образ (например с top) или неверный Dockerfile."
+          if [ "$ep" != "/entrypoint.sh" ]; then
+            echo "Expected Entrypoint '/entrypoint.sh', got '${ep}'. Подставной образ (например с top) или неверный Dockerfile."
             docker inspect "${IMAGE_NAME}:${VERIFY_TAG}"
             exit 1
           fi

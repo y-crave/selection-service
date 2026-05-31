@@ -11,11 +11,25 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /bin/selection-service ./cmd/main.go
 
-# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
-FROM gcr.io/distroless/static-debian12:nonroot
+# --- migrate CLI ---
+FROM migrate/migrate:v4.17.1 AS migrate
 
+# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
+FROM alpine:3.20
+
+RUN apk add --no-cache ca-certificates tzdata
+
+COPY --from=migrate /migrate /usr/local/bin/migrate
 COPY --from=builder /bin/selection-service /selection-service
+
+COPY internal/migrations /migrations
+COPY deploy/entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh /selection-service \
+    && adduser -D -u 65532 svc
+
+USER svc
 
 EXPOSE 8080 8081
 
-ENTRYPOINT ["/selection-service"]
+ENTRYPOINT ["/entrypoint.sh"]

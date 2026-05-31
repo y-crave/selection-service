@@ -5,6 +5,7 @@ import (
 	"database/sql"
 )
 
+// MonitoringService checks the health of service dependencies.
 type MonitoringService interface {
 	CheckDB(ctx context.Context) error
 }
