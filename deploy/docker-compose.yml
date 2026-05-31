@@ -1,55 +1,45 @@
-version: '3.8'
+# DB_PORT в selection-service всегда 5432: это порт внутри контейнера Postgres.
+# Сопоставление "5436:5432" публикует 5436 только на хосте (доступ с машины разработчика).
+# Если меняете POSTGRES_* при уже существующем томе postgres_data, инит не перезапускается —
+# сделайте: docker compose down -v && docker compose up -d
 
 services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: dbname
+      POSTGRES_USER: selection_service
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: selection_service
     ports:
-      - "5432:5432"
+      - "5436:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U selection_service -d selection_service"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+      start_period: 10s
 
-  redis:
-    image: redis:7
+  selection-service:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
     ports:
-      - "6379:6379"
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
+      - "8082:8080"
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  kafka:
-    image: confluentinc/cp-kafka:7.3.0
+      HTTP_HOST: "0.0.0.0"
+      HTTP_PORT: "8080"
+      APP_NAME: "selection-service"
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_NAME: "selection_service"
+      DB_USER: "selection_service"
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_USE_TLS: "false"
     depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      POSTGRES_DSN: "postgres://user:password@postgres:5432/dbname?sslmode=disable"
-      REDIS_ADDR: "redis:6379"
-      KAFKA_BROKER: "kafka:9092"
-    depends_on:
-      - postgres
-      - redis
-      - kafka
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:

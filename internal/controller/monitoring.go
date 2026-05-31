@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"selection-service/internal/service"
 	"context"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"selection-service/internal/service"
 	"time"
 )
 
